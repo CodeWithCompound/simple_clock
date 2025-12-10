@@ -1,5 +1,5 @@
 # simple_clock
-![screenshot](preview_CHANGE_ME.png)
+![screenshot](preview_simple_clock.png)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](https://opensource.org/licenses/MIT)
 
 a little side project to revisit the basics, i want it to be polished and functional as much as my knowlage allows that. a clock as you'd expect one (analouge)
