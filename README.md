@@ -30,5 +30,5 @@ a little side project to revisit the basics, i want it to be polished and functi
 
 ```bash
 # clone the repo
-git clone https://github.com/USERNAME/REPO_NAME.git
+git clone https://github.com/CodeWithCompound/simple_clock.git
 cd REPO_NAME
