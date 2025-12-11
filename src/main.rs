@@ -64,8 +64,10 @@ fn draw_seconds_line() {
 
     // seconds in the current minute (0.0 .. 60.0)
     let seconds = (current_time % 60.0) as f32;
-    let display_seconds = format!("{:.2}", seconds);
+    let display_seconds = format!("Seconds from Start: {:.2}", seconds);
+    let display_minutes = format!("Minutes from Start: {:.2}", (current_time / 60.0) % 60.0);
     draw_text(&display_seconds, 10.0, 20.0, 30.0, BLACK);
+    draw_text(&display_minutes, 10.0, 50.0, 30.0, BLACK);
 
     // 360 degrees / 60 seconds = 6 degrees per second
     let angle_deg = seconds * 6.0_f32;
