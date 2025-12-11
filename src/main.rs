@@ -41,6 +41,7 @@ fn draw_minute_marks() {
     );
     // draw minute marks with i (being the index of the mark) multiplied by the angle between marks
     for i in 0..minute_marks.x as i32 {
+        let sec = 0;
         let angle = i as f32 * minute_marks.y;
         let (sin_angle, cos_angle) = angle.to_radians().sin_cos();
         // the inner and outer radius of the minute marks to draw lines between
@@ -63,6 +64,8 @@ fn draw_seconds_line() {
 
     // seconds in the current minute (0.0 .. 60.0)
     let seconds = (current_time % 60.0) as f32;
+    let display_seconds = format!("{:.2}", seconds);
+    draw_text(&display_seconds, 10.0, 20.0, 30.0, BLACK);
 
     // 360 degrees / 60 seconds = 6 degrees per second
     let angle_deg = seconds * 6.0_f32;
