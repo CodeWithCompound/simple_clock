@@ -1,18 +1,10 @@
-use std::fmt::format;
 use macroquad::prelude::*;
 
 fn draw_clock() {
     // outer circle
-    draw_poly(
-        screen_width() / 2.0,
-        screen_height() / 2.0,
-        200,
-        200.0,
-        0.0,
-        WHITE,
-    );
-    // inner circle
-     draw_poly_lines(
+    draw_poly(screen_width() / 2.0, screen_height() / 2.0, 200, 200.0, 0.0, WHITE);
+    // inner circle outline
+    draw_poly_lines(
         screen_width() / 2.0,
         screen_height() / 2.0,
         200,
@@ -33,74 +25,87 @@ fn draw_clock() {
     );
 }
 
-
 fn draw_minute_marks() {
-    let minute_marks = vec2(
-        12.0, // number of marks
-        30.0, // angle between marks
-    );
-    // draw minute marks with i (being the index of the mark) multiplied by the angle between marks
-    for i in 0..minute_marks.x as i32 {
-        let sec = 0;
-        let angle = i as f32 * minute_marks.y;
+    //whatever this monster is
+    let num_marks = 12;
+    let angle_between = 30.0_f32;
+    for i in 0..num_marks {
+        let angle = i as f32 * angle_between;
         let (sin_angle, cos_angle) = angle.to_radians().sin_cos();
-        // the inner and outer radius of the minute marks to draw lines between
         let inner_radius: f32 = 180.0;
         let outer_radius: f32 = 200.0;
-        // calculate start and end positions of the lines
-        let start_x: f32 = screen_width() / 2.0 + inner_radius * sin_angle;
-        let start_y: f32 = screen_height() / 2.0 - inner_radius * cos_angle;
-        let end_x: f32 = screen_width() / 2.0 + outer_radius * sin_angle;
-        let end_y: f32 = screen_height() / 2.0 - outer_radius * cos_angle;
-
+        let cx = screen_width() / 2.0;
+        let cy = screen_height() / 2.0;
+        let start_x = cx + inner_radius * sin_angle;
+        let start_y = cy - inner_radius * cos_angle;
+        let end_x = cx + outer_radius * sin_angle;
+        let end_y = cy - outer_radius * cos_angle;
+        //serious line drawing business
         draw_line(start_x, start_y, end_x, end_y, 2.0, BLACK);
     }
 }
 
-
-fn draw_seconds_line() {
-    // get_time() -> f64 (seconds since the program started)
-    let current_time = get_time();
-
-    // seconds in the current minute (0.0 .. 60.0)
-    let seconds = (current_time % 60.0) as f32;
+fn draw_seconds_line(elapsed: f32) {
+    // seconds in the current minute and minutes in the current hour and so on
+    let seconds = elapsed % 60.0;
+    let minutes = (elapsed / 60.0) % 60.0;
     let display_seconds = format!("Seconds from Start: {:.2}", seconds);
-    let display_minutes = format!("Minutes from Start: {:.2}", (current_time / 60.0) % 60.0);
+    let display_minutes = format!("Minutes from Start: {:.2}", minutes);
     draw_text(&display_seconds, 10.0, 20.0, 30.0, BLACK);
     draw_text(&display_minutes, 10.0, 50.0, 30.0, BLACK);
 
-    // 360 degrees / 60 seconds = 6 degrees per second
+    // 360 deg / 60 s = 6 deg per second
     let angle_deg = seconds * 6.0_f32;
-
-    // trig functions expect radians, so convert
     let angle_rad = angle_deg.to_radians();
-
-    // compute both sin and cos in one go (slightly faster)
     let (sin_a, cos_a) = angle_rad.sin_cos();
 
-    // geometry
     let line_length: f32 = 160.0;
     let cx: f32 = screen_width() / 2.0;
     let cy: f32 = screen_height() / 2.0;
-
-    // x increases to the right, y increases downward.
-    // using sin for x and -cos for y makes 0° point *up* and positive angles rotate *clockwise*,
-    // which matches how clock hands move.
     let end_x = cx + line_length * sin_a;
     let end_y = cy - line_length * cos_a;
 
-    // draw the line
     draw_line(cx, cy, end_x, end_y, 2.0, RED);
 }
 
-#[macroquad::main("i click button, i happy")]
+#[macroquad::main("i make clock, i very proud")]
 async fn main() {
+    let mut elapsed_time: f32 = 0.0; // tracks elapsed time while clock is running
+    let mut run_the_clock: bool = true;
+
+    let x = 10.0;
+    let y = screen_height() - 120.0;
+    let w = 200.0;
+    let h = 100.0;
+    let color = BLACK;
+
     loop {
-        // the functions to draw the clock, clearing the background each frame and waiting for the next frame and such
+        // update elapsed_time ONLY while the clock is running
+        if run_the_clock {
+            elapsed_time += get_frame_time();
+        }
+
+        // mouse + button logic (evaluated each frame)
+        let (mx, my) = mouse_position();
+        let hovered = mx >= x && mx <= x + w && my >= y && my <= y + h;
+        let clicked = is_mouse_button_pressed(MouseButton::Left) && hovered;
+
+        if clicked {
+            run_the_clock = !run_the_clock;
+        }
+
         clear_background(GRAY);
         draw_clock();
-        draw_seconds_line();
         draw_minute_marks();
+        draw_seconds_line(elapsed_time);
+
+        // button text reflect state
+        let button_text = if run_the_clock { "Stop Clock" } else { "Start Clock" };
+
+        // draw the button last so it appears above the clock
+        draw_rectangle(x, y, w, h, if hovered { DARKGRAY } else { color });
+        draw_text(button_text, x + 20.0, y + h / 2.0 + 10.0, 30.0, WHITE);
+
         next_frame().await;
     }
 }
