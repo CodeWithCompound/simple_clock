@@ -1,8 +1,8 @@
 use macroquad::prelude::*;
 
-fn draw_clock() {
+fn draw_clock(radius_poly: f32) {
     // outer circle
-    draw_poly(screen_width() / 2.0, screen_height() / 2.0, 200, 200.0, 0.0, WHITE);
+    draw_poly(screen_width() / 2.0, screen_height() / 2.0, 200, radius_poly, 0.0, WHITE);
     // inner circle outline
     draw_poly_lines(
         screen_width() / 2.0,
@@ -73,13 +73,15 @@ async fn main() {
     let mut elapsed_time: f32 = 0.0; // tracks elapsed time while clock is running
     let mut run_the_clock: bool = true;
 
-    let x = 10.0;
-    let y = screen_height() - 120.0;
     let w = 200.0;
     let h = 100.0;
-    let color = BLACK;
+    let radius_poly = 200.0;
+    let color = WHITE;
 
     loop {
+    let x = screen_width() / 2.0 - w / 2.0;
+    let y = screen_height() / 2.0 - h / 2.0 + radius_poly+ 15.0;
+     let button_text = if run_the_clock { "Stop Clock" } else { "Start Clock" };
         // update elapsed_time ONLY while the clock is running
         if run_the_clock {
             elapsed_time += get_frame_time();
@@ -94,17 +96,19 @@ async fn main() {
             run_the_clock = !run_the_clock;
         }
 
-        clear_background(GRAY);
-        draw_clock();
+                clear_background(GRAY);
+                draw_rectangle(x, y, w, h, if hovered { DARKGRAY } else { color });
+                draw_rectangle_lines(x, y, w, h, 10.0, BLACK);
+        draw_text(button_text, x + 20.0, y + h / 2.0 + 10.0, 30.0, BLACK);
+
+        draw_clock(radius_poly);
         draw_minute_marks();
         draw_seconds_line(elapsed_time);
 
         // button text reflect state
-        let button_text = if run_the_clock { "Stop Clock" } else { "Start Clock" };
+
 
         // draw the button last so it appears above the clock
-        draw_rectangle(x, y, w, h, if hovered { DARKGRAY } else { color });
-        draw_text(button_text, x + 20.0, y + h / 2.0 + 10.0, 30.0, WHITE);
 
         next_frame().await;
     }
