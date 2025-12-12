@@ -1,4 +1,4 @@
-use macroquad::prelude::*;
+use macroquad::{miniquad::native::windows::run, prelude::*};
 
 fn draw_clock(radius_poly: f32) {
     // outer circle
@@ -93,6 +93,7 @@ async fn main() {
         // update elapsed_time ONLY while the clock is running
         if run_the_clock {
             elapsed_time += get_frame_time();
+            // indicator: draw_poly(x, y, sides, radius, rotation, color);
         }
 
         // mouse + button logic (evaluated each frame)
@@ -105,7 +106,7 @@ async fn main() {
         }
 
                 clear_background(GRAY);
-                draw_rectangle(x, y, w, h, if hovered { DARKGRAY } else { color });
+                draw_rectangle(x, y, w, h, if hovered && run_the_clock{ RED } else if hovered && !run_the_clock { GREEN } else { color });
                 draw_rectangle_lines(x, y, w, h, 10.0, BLACK);
         draw_text(button_text, x + 30.0, y + h / 2.0 + 20.0, 30.0, BLACK);
 
