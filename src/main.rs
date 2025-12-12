@@ -47,12 +47,20 @@ fn draw_minute_marks() {
 
 fn draw_seconds_line(elapsed: f32) {
     // seconds in the current minute and minutes in the current hour and so on
-    let seconds = elapsed % 60.0;
-    let minutes = (elapsed / 60.0) % 60.0;
+draw_rectangle(screen_width() / 95.0, screen_height() / 95.0, screen_width() / 3.0, screen_height() / 5.0, LIGHTGRAY);
+draw_rectangle_lines(screen_width() / 95.0, screen_height() / 95.0, screen_width() / 3.0, screen_height() / 5.0, 7.0, BLACK);
+
+    let seconds = elapsed % 60.;
+    let minutes = (elapsed % 60.0) / 60.0;
+    let laps = elapsed / 60.0;
+
     let display_seconds = format!("Seconds from Start: {:.2}", seconds);
     let display_minutes = format!("Minutes from Start: {:.2}", minutes);
-    draw_text(&display_seconds, 10.0, 20.0, 30.0, BLACK);
-    draw_text(&display_minutes, 10.0, 50.0, 30.0, BLACK);
+    let display_laps = format!("Laps (seconds): {:.1}", laps);
+    
+    draw_text(&display_seconds, screen_width() / 90.0, screen_height() / 10.0, screen_width() / 33.0, BLACK);
+    draw_text(&display_minutes, screen_width() / 90.0, screen_height() / 8.0, screen_width() / 33.0, BLACK);
+    draw_text(&display_laps, screen_width() / 90.0, screen_height() / 6.0, screen_width() / 33.0, BLACK);
 
     // 360 deg / 60 s = 6 deg per second
     let angle_deg = seconds * 6.0_f32;
