@@ -99,7 +99,7 @@ async fn main() {
                 clear_background(GRAY);
                 draw_rectangle(x, y, w, h, if hovered { DARKGRAY } else { color });
                 draw_rectangle_lines(x, y, w, h, 10.0, BLACK);
-        draw_text(button_text, x + 20.0, y + h / 2.0 + 10.0, 30.0, BLACK);
+        draw_text(button_text, x + 30.0, y + h / 2.0 + 20.0, 30.0, BLACK);
 
         draw_clock(radius_poly);
         draw_minute_marks();
