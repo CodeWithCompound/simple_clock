@@ -13,6 +13,7 @@ fn draw_clock(radius_poly: f32) {
         7.0,
         BLACK,
     );
+    
     // middle ring for the lines
     draw_poly_lines(
         screen_width() / 2.0,
@@ -93,7 +94,6 @@ async fn main() {
         // update elapsed_time ONLY while the clock is running
         if run_the_clock {
             elapsed_time += get_frame_time();
-            // indicator: draw_poly(x, y, sides, radius, rotation, color);
         }
 
         // mouse + button logic (evaluated each frame)
@@ -112,9 +112,16 @@ async fn main() {
 
         draw_clock(radius_poly);
         draw_minute_marks();
+        if run_the_clock {
+            draw_poly(screen_width() / 2.0, screen_height() / 2.0, 40, 10.0, 0.0, GREEN);
+        } else {
+            draw_poly(screen_width() / 2.0, screen_height() / 2.0, 40, 10.0, 0.0, RED);
+        }
+        // inner inner inner circle outline
+                // button text reflect state
         draw_seconds_line(elapsed_time);
+        draw_poly(screen_width() / 2.0, screen_height() / 2.0, 40, 6.0, 0.0, BLACK);
 
-        // button text reflect state
 
 
         // draw the button last so it appears above the clock
