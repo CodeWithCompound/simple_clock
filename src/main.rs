@@ -2,7 +2,14 @@ use macroquad::{miniquad::native::windows::run, prelude::*};
 
 fn draw_clock(radius_poly: f32) {
     // outer circle
-    draw_poly(screen_width() / 2.0, screen_height() / 2.0, 200, radius_poly, 0.0, WHITE);
+    draw_poly(
+        screen_width() / 2.0,
+        screen_height() / 2.0,
+        200,
+        radius_poly,
+        0.0,
+        WHITE,
+    );
     // inner circle outline
     draw_poly_lines(
         screen_width() / 2.0,
@@ -13,7 +20,7 @@ fn draw_clock(radius_poly: f32) {
         7.0,
         BLACK,
     );
-    
+
     // middle ring for the lines
     draw_poly_lines(
         screen_width() / 2.0,
@@ -48,8 +55,21 @@ fn draw_minute_marks() {
 
 fn draw_seconds_line(elapsed: f32) {
     // seconds in the current minute and minutes in the current hour and so on
-draw_rectangle(screen_width() / 95.0, screen_height() / 95.0, screen_width() / 3.0, screen_height() / 5.0, LIGHTGRAY);
-draw_rectangle_lines(screen_width() / 95.0, screen_height() / 95.0, screen_width() / 3.0, screen_height() / 5.0, 7.0, BLACK);
+    draw_rectangle(
+        screen_width() / 95.0,
+        screen_height() / 95.0,
+        screen_width() / 3.0,
+        screen_height() / 5.0,
+        LIGHTGRAY,
+    );
+    draw_rectangle_lines(
+        screen_width() / 95.0,
+        screen_height() / 95.0,
+        screen_width() / 3.0,
+        screen_height() / 5.0,
+        7.0,
+        BLACK,
+    );
 
     let seconds = elapsed % 60.;
     let minutes = (elapsed % 60.0) / 60.0;
@@ -58,10 +78,28 @@ draw_rectangle_lines(screen_width() / 95.0, screen_height() / 95.0, screen_width
     let display_seconds = format!("Seconds from Start: {:.2}", seconds);
     let display_minutes = format!("Minutes from Start: {:.2}", minutes);
     let display_laps = format!("Laps (seconds): {:.1}", laps);
-    
-    draw_text(&display_seconds, screen_width() / 90.0, screen_height() / 10.0, screen_width() / 33.0, BLACK);
-    draw_text(&display_minutes, screen_width() / 90.0, screen_height() / 8.0, screen_width() / 33.0, BLACK);
-    draw_text(&display_laps, screen_width() / 90.0, screen_height() / 6.0, screen_width() / 33.0, BLACK);
+
+    draw_text(
+        &display_seconds,
+        screen_width() / 90.0,
+        screen_height() / 10.0,
+        screen_width() / 33.0,
+        BLACK,
+    );
+    draw_text(
+        &display_minutes,
+        screen_width() / 90.0,
+        screen_height() / 8.0,
+        screen_width() / 33.0,
+        BLACK,
+    );
+    draw_text(
+        &display_laps,
+        screen_width() / 90.0,
+        screen_height() / 6.0,
+        screen_width() / 33.0,
+        BLACK,
+    );
 
     // 360 deg / 60 s = 6 deg per second
     let angle_deg = seconds * 6.0_f32;
@@ -88,9 +126,13 @@ async fn main() {
     let color = WHITE;
 
     loop {
-    let x = screen_width() / 2.0 - w / 2.0;
-    let y = screen_height() / 2.0 - h / 2.0 + radius_poly+ 15.0;
-     let button_text = if run_the_clock { "Stop Clock" } else { "Start Clock" };
+        let x = screen_width() / 2.0 - w / 2.0;
+        let y = screen_height() / 2.0 - h / 2.0 + radius_poly + 15.0;
+        let button_text = if run_the_clock {
+            "Stop Clock"
+        } else {
+            "Start Clock"
+        };
         // update elapsed_time ONLY while the clock is running
         if run_the_clock {
             elapsed_time += get_frame_time();
@@ -105,26 +147,53 @@ async fn main() {
             run_the_clock = !run_the_clock;
         }
 
-                clear_background(GRAY);
-                draw_rectangle(x, y, w, h, if hovered && run_the_clock{ RED } else if hovered && !run_the_clock { GREEN } else { color });
-                draw_rectangle_lines(x, y, w, h, 10.0, BLACK);
+        clear_background(GRAY);
+        draw_rectangle(
+            x,
+            y,
+            w,
+            h,
+            if hovered && run_the_clock {
+                RED
+            } else if hovered && !run_the_clock {
+                GREEN
+            } else {
+                color
+            },
+        );
+        draw_rectangle_lines(x, y, w, h, 10.0, BLACK);
         draw_text(button_text, x + 30.0, y + h / 2.0 + 20.0, 30.0, BLACK);
 
         draw_clock(radius_poly);
         draw_minute_marks();
         if run_the_clock {
-            draw_poly(screen_width() / 2.0, screen_height() / 2.0, 40, 10.0, 0.0, GREEN);
+            draw_poly(
+                screen_width() / 2.0,
+                screen_height() / 2.0,
+                40,
+                10.0,
+                0.0,
+                GREEN,
+            );
         } else {
-            draw_poly(screen_width() / 2.0, screen_height() / 2.0, 40, 10.0, 0.0, RED);
+            draw_poly(
+                screen_width() / 2.0,
+                screen_height() / 2.0,
+                40,
+                10.0,
+                0.0,
+                RED,
+            );
         }
-        // inner inner inner circle outline
-                // button text reflect state
         draw_seconds_line(elapsed_time);
-        draw_poly(screen_width() / 2.0, screen_height() / 2.0, 40, 6.0, 0.0, BLACK);
-
-
-
-        // draw the button last so it appears above the clock
+        draw_poly(
+            screen_width() / 2.0,
+            screen_height() / 2.0,
+            40,
+            6.0,
+            0.0,
+            BLACK,
+        );
 
         next_frame().await;
     }
