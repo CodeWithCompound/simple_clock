@@ -20,9 +20,11 @@ a little side project to revisit the basics, i want it to be polished and functi
 - Smoothly moving second line
 - Minute markers every 5 minutes
 - Indication for if the clock is on or off and the toggle button
+- Using enum for ease of adding a sync to real time later
 ![wip](https://img.shields.io/badge/status-WIP-blue)
 - something the user can interact with, even if it's just the clocks coulur (50% done, stop/start clock
 - minutes indicator
+- sync to real time
   
 
 ---
