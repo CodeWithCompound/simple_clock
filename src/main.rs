@@ -84,8 +84,9 @@ fn draw_seconds_line(elapsed: f32) {
         BLACK,
     );
 
-    let seconds = elapsed % 60.;
-    let minutes = (elapsed % 60.0) / 60.0;
+let seconds = elapsed % 60.0;
+let minutes = (elapsed / 60.0) % 60.0;
+
     let laps = elapsed / 60.0;
 
     let display_seconds = format!("Seconds from Start: {:.2}", seconds);
@@ -210,6 +211,7 @@ async fn main() {
                     40.0,
                     BLACK,
                 );
+                        draw_seconds_line(elapsed_time);
                 
 
 
