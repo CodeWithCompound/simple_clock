@@ -1,4 +1,6 @@
 use macroquad::prelude::*;
+
+#[derive(PartialEq, Clone, Copy)]
 enum State {
     Timer,
     Stopped,
@@ -119,7 +121,7 @@ fn draw_seconds_line(elapsed: f32) {
     draw_line(cx, cy, end_x, end_y, 2.0, RED);
 }
 
-#[macroquad::main("i make clock, i very proud")]
+#[macroquad::main("Clock Timer thing with States and such")]
 async fn main() {
     let mut state = State::Timer;
     let mut elapsed_time: f32 = 0.0; // tracks elapsed time while clock is running
@@ -153,9 +155,10 @@ async fn main() {
                     0.0,
                     GREEN,
                 );
+                
                 draw_rectangle(x, y, w, h, if hovered { RED } else { color });
-                draw_rectangle_lines(x, y, w, h, 10.0, BLACK);
                 draw_text(button_text, x + 30.0, y + h / 2.0 + 20.0, 30.0, BLACK);
+                draw_rectangle_lines(x, y, w, h, 10.0, BLACK);
                 // change to State::Stopped when button clicked eg: if button() { state = State::Stopped
                 if clicked {
                     state = State::Stopped;
@@ -171,6 +174,7 @@ async fn main() {
                     0.0,
                     RED,
                 );
+                
                 draw_rectangle(x, y, w, h, if hovered { GREEN } else { color });
                 draw_rectangle_lines(x, y, w, h, 10.0, BLACK);
                 draw_text(button_text, x + 30.0, y + h / 2.0 + 20.0, 30.0, BLACK);
