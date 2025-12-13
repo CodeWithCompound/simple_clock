@@ -1,5 +1,5 @@
 use macroquad::prelude::*;
-
+use chrono::{Local, Timelike};
 #[derive(PartialEq, Clone, Copy)]
 enum State {
     Timer,
@@ -139,7 +139,7 @@ fn draw_seconds_line(elapsed: f32) {
 
 #[macroquad::main("Clock Timer thing with States and such")]
 async fn main() {
-    let mut state = State::Timer;
+    let mut state = State::Sync;
     let mut elapsed_time: f32 = 0.0; // tracks elapsed time while clock is running
 
     let w = 200.0;
@@ -199,10 +199,25 @@ async fn main() {
                 }
             }
             State::Sync => {
+                let now = Local::now();
+                elapsed_time = (now.minute() * 60 + now.second()) as f32;
+                let sec: u32 = now.second();
+                let min: u32 = now.minute();
+                draw_text(
+                    &format!("test times: {:02}:{:02}", min, sec),
+                    screen_width() / 4.0,
+                    screen_height() / 2.0,
+                    40.0,
+                    BLACK,
+                );
+                
+
+
                 // chill, do nothing
             }
         }
-        draw_clock(state, radius_poly);
+        if state == State::Stopped || state == State::Timer {
+                    draw_clock(state, radius_poly);
         draw_minute_marks();
         draw_seconds_line(elapsed_time);
 
@@ -214,6 +229,7 @@ async fn main() {
             0.0,
             BLACK,
         );
+        }
 
         next_frame().await
     }
