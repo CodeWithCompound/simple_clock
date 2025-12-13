@@ -91,17 +91,17 @@ fn draw_seconds_line(elapsed: f32) {
     let display_seconds = format!("Seconds from Start: {:.2}", seconds);
     let display_minutes = format!("Minutes from Start: {:.2}", minutes);
     let display_laps = format!("Laps (seconds): {:.1}", laps);
-
+    // next update i want to get the text lenght nd center it properly
     draw_text(
         &display_seconds,
-        screen_width() / 90.0,
+        screen_width() / 70.0,
         screen_height() / 10.0,
         screen_width() / 33.0,
         BLACK,
     );
     draw_text(
         &display_minutes,
-        screen_width() / 90.0,
+        screen_width() / 70.0,
         screen_height() / 8.0,
         screen_width() / 33.0,
         BLACK,
