@@ -1,5 +1,9 @@
-use macroquad::{miniquad::native::windows::run, prelude::*};
-
+use macroquad::prelude::*;
+enum State {
+    Timer,
+    Stopped,
+    Sync,
+}
 fn draw_clock(radius_poly: f32) {
     // outer circle
     draw_poly(
@@ -117,8 +121,8 @@ fn draw_seconds_line(elapsed: f32) {
 
 #[macroquad::main("i make clock, i very proud")]
 async fn main() {
+    let mut state = State::Timer;
     let mut elapsed_time: f32 = 0.0; // tracks elapsed time while clock is running
-    let mut run_the_clock: bool = true;
 
     let w = 200.0;
     let h = 100.0;
@@ -128,63 +132,58 @@ async fn main() {
     loop {
         let x = screen_width() / 2.0 - w / 2.0;
         let y = screen_height() / 2.0 - h / 2.0 + radius_poly + 15.0;
-        let button_text = if run_the_clock {
-            "Stop Clock"
-        } else {
-            "Start Clock"
-        };
         // update elapsed_time ONLY while the clock is running
-        if run_the_clock {
-            elapsed_time += get_frame_time();
-        }
 
         // mouse + button logic (evaluated each frame)
         let (mx, my) = mouse_position();
         let hovered = mx >= x && mx <= x + w && my >= y && my <= y + h;
         let clicked = is_mouse_button_pressed(MouseButton::Left) && hovered;
 
-        if clicked {
-            run_the_clock = !run_the_clock;
-        }
-
         clear_background(GRAY);
-        draw_rectangle(
-            x,
-            y,
-            w,
-            h,
-            if hovered && run_the_clock {
-                RED
-            } else if hovered && !run_the_clock {
-                GREEN
-            } else {
-                color
-            },
-        );
-        draw_rectangle_lines(x, y, w, h, 10.0, BLACK);
-        draw_text(button_text, x + 30.0, y + h / 2.0 + 20.0, 30.0, BLACK);
 
+        match state {
+            State::Timer => {
+                let button_text = "Stop Clock";
+                elapsed_time += get_frame_time();
+                draw_poly(
+                    screen_width() / 2.0,
+                    screen_height() / 2.0,
+                    40,
+                    10.0,
+                    0.0,
+                    GREEN,
+                );
+                draw_rectangle(x, y, w, h, if hovered { RED } else { color });
+                draw_rectangle_lines(x, y, w, h, 10.0, BLACK);
+                draw_text(button_text, x + 30.0, y + h / 2.0 + 20.0, 30.0, BLACK);
+                // change to State::Stopped when button clicked eg: if button() { state = State::Stopped
+                if clicked {
+                    state = State::Stopped;
+                }
+            }
+            State::Stopped => {
+                let button_text = "Start Clock";
+                draw_poly(
+                    screen_width() / 2.0,
+                    screen_height() / 2.0,
+                    40,
+                    10.0,
+                    0.0,
+                    RED,
+                );
+                draw_rectangle(x, y, w, h, if hovered { GREEN } else { color });
+                draw_rectangle_lines(x, y, w, h, 10.0, BLACK);
+                draw_text(button_text, x + 30.0, y + h / 2.0 + 20.0, 30.0, BLACK);
+                if clicked {
+                    state = State::Timer;
+                }
+            }
+            State::Sync => {
+                // chill, do nothing
+            }
+        }
         draw_clock(radius_poly);
         draw_minute_marks();
-        if run_the_clock {
-            draw_poly(
-                screen_width() / 2.0,
-                screen_height() / 2.0,
-                40,
-                10.0,
-                0.0,
-                GREEN,
-            );
-        } else {
-            draw_poly(
-                screen_width() / 2.0,
-                screen_height() / 2.0,
-                40,
-                10.0,
-                0.0,
-                RED,
-            );
-        }
         draw_seconds_line(elapsed_time);
         draw_poly(
             screen_width() / 2.0,
@@ -195,6 +194,6 @@ async fn main() {
             BLACK,
         );
 
-        next_frame().await;
+        next_frame().await
     }
 }
