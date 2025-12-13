@@ -1,5 +1,5 @@
-use macroquad::prelude::*;
 use chrono::{Local, Timelike};
+use macroquad::prelude::*;
 #[derive(PartialEq, Clone, Copy)]
 enum State {
     Timer,
@@ -84,14 +84,13 @@ fn draw_seconds_line(elapsed: f32) {
         BLACK,
     );
 
-let seconds = elapsed % 60.0;
-let minutes = (elapsed / 60.0) % 60.0;
-
-    let laps = elapsed / 60.0;
+    let seconds = elapsed % 60.0;
+    let minutes = (elapsed / 60.0) % 60.0;
+    let hours = (elapsed / 3600.0) % 24.0;
 
     let display_seconds = format!("Seconds from Start: {:.2}", seconds);
     let display_minutes = format!("Minutes from Start: {:.2}", minutes);
-    let display_laps = format!("Laps (seconds): {:.1}", laps);
+    let display_hours = format!("Hours from Start: {:.2}", hours);
     // next update i want to get the text lenght nd center it properly
     draw_text(
         &display_seconds,
@@ -108,7 +107,7 @@ let minutes = (elapsed / 60.0) % 60.0;
         BLACK,
     );
     draw_text(
-        &display_laps,
+        &display_hours,
         screen_width() / 90.0,
         screen_height() / 6.0,
         screen_width() / 33.0,
@@ -116,15 +115,14 @@ let minutes = (elapsed / 60.0) % 60.0;
     );
 
     // 360 deg / 60 s = 6 deg per second
-    let angle_deg = seconds * 6.0_f32;
-    let angle_rad = angle_deg.to_radians();
-    let (sin_a, cos_a) = angle_rad.sin_cos();
-
-    let line_length: f32 = 160.0;
+    let angle_sec_deg = seconds * 6.0_f32;
+    let angle_sec_rad = angle_sec_deg.to_radians();
+    let (sin_sec, cos_sec) = angle_sec_rad.sin_cos();
+    let line_length_sec: f32 = 160.0;
     let cx: f32 = screen_width() / 2.0;
     let cy: f32 = screen_height() / 2.0;
-    let end_x = cx + line_length * sin_a;
-    let end_y = cy - line_length * cos_a;
+    let end_sec_x = cx + line_length_sec * sin_sec;
+    let end_sec_y = cy - line_length_sec * cos_sec;
 
     let angle_min_deg = minutes * 6.0;
     let angle_min_rad = angle_min_deg.to_radians();
@@ -134,8 +132,17 @@ let minutes = (elapsed / 60.0) % 60.0;
     let end_min_y = cy - line_length_min * cos_min;
     draw_line(cx, cy, end_min_x, end_min_y, 4.0, BLUE);
 
-    draw_line(cx, cy, end_x, end_y, 2.0, RED);
-    draw_line(cx, cy, end_min_x, end_min_y, 4.0, BLACK);
+let angle_hour_deg = (hours % 12.0) * 30.0 + (minutes / 60.0) * 30.0;
+    let angle_hour_rad = angle_hour_deg.to_radians();
+    let (sin_hour, cos_hour) = angle_hour_rad.sin_cos();
+    let line_length_hour = 100.0;
+    let end_hour_x = cx + line_length_hour * sin_hour;
+    let end_hour_y = cy - line_length_hour * cos_hour;
+
+    draw_line(cx, cy, end_hour_x, end_hour_y, 6.0, DARKGRAY);
+        draw_line(cx, cy, end_min_x, end_min_y, 4.0, BLACK);
+    draw_line(cx, cy, end_sec_x, end_sec_y, 2.0, RED);
+
 }
 
 #[macroquad::main("Clock Timer thing with States and such")]
@@ -211,15 +218,13 @@ async fn main() {
                     40.0,
                     BLACK,
                 );
-                        draw_seconds_line(elapsed_time);
-                
-
+                draw_seconds_line(elapsed_time);
 
                 // chill, do nothing
             }
         }
-        if state == State::Stopped || state == State::Timer {
-                    draw_clock(state, radius_poly);
+
+        draw_clock(state, radius_poly);
         draw_minute_marks();
         draw_seconds_line(elapsed_time);
 
@@ -231,8 +236,14 @@ async fn main() {
             0.0,
             BLACK,
         );
-        }
 
         next_frame().await
     }
 }
+
+//quick note for myself: add the iconic clock ticking sound effect when running for the seconds line
+//and maybe a different sound when starting/stopping the clock
+//OH YEAH also add better minute and hour lines
+//maybe even a ticking sound for the minute hand every minute too
+//and maybe even a chime on the hour?
+//so many ideas omg
