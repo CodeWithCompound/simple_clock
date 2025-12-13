@@ -26,7 +26,14 @@ fn draw_clock(state: State, radius_poly: f32) {
         7.0,
         BLACK,
     );
-    draw_poly(screen_width() / 2.0, screen_height() / 2.0, 40, 10.0, 0.0, if state == State::Timer { GREEN } else { RED });
+    draw_poly(
+        screen_width() / 2.0,
+        screen_height() / 2.0,
+        40,
+        10.0,
+        0.0,
+        if state == State::Timer { GREEN } else { RED },
+    );
     // middle ring for the lines
     draw_poly_lines(
         screen_width() / 2.0,
@@ -118,7 +125,16 @@ fn draw_seconds_line(elapsed: f32) {
     let end_x = cx + line_length * sin_a;
     let end_y = cy - line_length * cos_a;
 
+    let angle_min_deg = minutes * 6.0;
+    let angle_min_rad = angle_min_deg.to_radians();
+    let (sin_min, cos_min) = angle_min_rad.sin_cos();
+    let line_length_min = 140.0;
+    let end_min_x = cx + line_length_min * sin_min;
+    let end_min_y = cy - line_length_min * cos_min;
+    draw_line(cx, cy, end_min_x, end_min_y, 4.0, BLUE);
+
     draw_line(cx, cy, end_x, end_y, 2.0, RED);
+    draw_line(cx, cy, end_min_x, end_min_y, 4.0, BLACK);
 }
 
 #[macroquad::main("Clock Timer thing with States and such")]
@@ -155,7 +171,7 @@ async fn main() {
                     0.0,
                     GREEN,
                 );
-                
+
                 draw_rectangle(x, y, w, h, if hovered { RED } else { color });
                 draw_text(button_text, x + 30.0, y + h / 2.0 + 20.0, 30.0, BLACK);
                 draw_rectangle_lines(x, y, w, h, 10.0, BLACK);
@@ -174,7 +190,7 @@ async fn main() {
                     0.0,
                     RED,
                 );
-                
+
                 draw_rectangle(x, y, w, h, if hovered { GREEN } else { color });
                 draw_rectangle_lines(x, y, w, h, 10.0, BLACK);
                 draw_text(button_text, x + 30.0, y + h / 2.0 + 20.0, 30.0, BLACK);
@@ -189,6 +205,7 @@ async fn main() {
         draw_clock(state, radius_poly);
         draw_minute_marks();
         draw_seconds_line(elapsed_time);
+
         draw_poly(
             screen_width() / 2.0,
             screen_height() / 2.0,
