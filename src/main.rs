@@ -6,7 +6,7 @@ enum State {
     Stopped,
     Sync,
 }
-fn draw_clock(radius_poly: f32) {
+fn draw_clock(state: State, radius_poly: f32) {
     // outer circle
     draw_poly(
         screen_width() / 2.0,
@@ -26,7 +26,7 @@ fn draw_clock(radius_poly: f32) {
         7.0,
         BLACK,
     );
-
+    draw_poly(screen_width() / 2.0, screen_height() / 2.0, 40, 10.0, 0.0, if state == State::Timer { GREEN } else { RED });
     // middle ring for the lines
     draw_poly_lines(
         screen_width() / 2.0,
@@ -186,7 +186,7 @@ async fn main() {
                 // chill, do nothing
             }
         }
-        draw_clock(radius_poly);
+        draw_clock(state, radius_poly);
         draw_minute_marks();
         draw_seconds_line(elapsed_time);
         draw_poly(
