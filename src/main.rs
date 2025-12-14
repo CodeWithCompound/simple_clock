@@ -68,34 +68,57 @@ fn draw_minute_marks() {
 
 fn draw_seconds_line(state: State, elapsed: f32) {
     // seconds in the current minute and minutes in the current hour and so on
+    let font_size = 40.0;
+    let font_scale = 1.0;
+    let seconds = elapsed % 60.0;
+    let minutes = (elapsed / 60.0) % 60.0;
+    let hours = (elapsed / 3600.0) % 24.0;
+    let display_time = format!(
+        "{:.0} : {:.0} : {:.0}",
+        hours.floor(),
+        minutes.floor(),
+        seconds.floor()
+    );
+
+    let metrics = measure_text(&display_time, None, font_size as u16, font_scale);
+    let width_display = metrics.width + 20.0;
+    let height_display = metrics.height + 20.0;
+    let text_x = screen_width() / 95.0 + 10.0;
+    let text_y = screen_height() / 95.0 + 10.0;
+    
     draw_rectangle(
-        screen_width() / 95.0,
-        screen_height() / 95.0,
-        screen_width() / 3.0,
-        screen_height() / 5.0,
+        text_x,
+        text_y,
+        width_display,
+        height_display,
         LIGHTGRAY,
     );
     draw_rectangle_lines(
         screen_width() / 95.0,
         screen_height() / 95.0,
-        screen_width() / 3.0,
-        screen_height() / 5.0,
+        metrics.width + 20.0,
+        metrics.height + 20.0,
         7.0,
         BLACK,
     );
 
-    let seconds = elapsed % 60.0;
-    let minutes = (elapsed / 60.0) % 60.0;
-    let hours = (elapsed / 3600.0) % 24.0;
+    let display_text = if state == State::Sync {
+        "Time:"
+    } else {
+        "Time since Start:"
+    };
+    draw_text(
+        &display_text,
+        text_x,
+        text_y,
+        screen_width() / 33.0,
+        BLACK,
+    );
 
-    let display_text = if state == State::Sync {"Time:"} else {"Time since Start:"};
-    draw_text(&display_text, screen_width() / 70.0, screen_height() / 13.0, screen_width() / 33.0, BLACK);
-    let display_time = format!("{:.0} : {:.0} : {:.0}" , hours.floor(), minutes.floor(), seconds.floor() );
-    
     draw_text(
         &display_time,
-        screen_width() / 70.0,
-        screen_height() / 10.0,
+        40.0,
+        40.0,
         screen_width() / 33.0,
         BLACK,
     );
@@ -128,13 +151,13 @@ fn draw_seconds_line(state: State, elapsed: f32) {
     draw_line(cx, cy, end_hour_x, end_hour_y, 6.0, DARKGRAY);
     draw_line(cx, cy, end_min_x, end_min_y, 4.0, BLACK);
     draw_line(cx, cy, end_sec_x, end_sec_y, 2.0, RED);
-
 }
 
 #[macroquad::main("Clock Timer thing with States and such")]
 async fn main() {
     let mut state = State::Sync;
-    let mut elapsed_time: f32 = 0.0; // tracks elapsed time while clock is running
+    // tracks elapsed time while clock is running
+    let mut elapsed_time: f32 = 0.0;
 
     let w = 200.0;
     let h = 100.0;
@@ -194,10 +217,7 @@ async fn main() {
             }
             State::Sync => {
                 let now = Local::now();
-                elapsed_time =
-    ((now.hour() * 3600) +
-     now.minute() * 60 +
-     now.second()) as f32;
+                elapsed_time = ((now.hour() * 3600) + now.minute() * 60 + now.second()) as f32;
 
                 let sec: u32 = now.second();
                 let min: u32 = now.minute();
@@ -208,7 +228,7 @@ async fn main() {
                     40.0,
                     BLACK,
                 );
-                draw_seconds_line(state ,elapsed_time);
+                draw_seconds_line(state, elapsed_time);
 
                 // chill, do nothing
             }
@@ -216,7 +236,7 @@ async fn main() {
 
         draw_clock(state, radius_poly);
         draw_minute_marks();
-        draw_seconds_line(state ,elapsed_time);
+        draw_seconds_line(state, elapsed_time);
 
         draw_poly(
             screen_width() / 2.0,
