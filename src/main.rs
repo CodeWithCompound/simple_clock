@@ -66,7 +66,7 @@ fn draw_minute_marks() {
     }
 }
 
-fn draw_seconds_line(elapsed: f32) {
+fn draw_seconds_line(state: State, elapsed: f32) {
     // seconds in the current minute and minutes in the current hour and so on
     draw_rectangle(
         screen_width() / 95.0,
@@ -88,28 +88,14 @@ fn draw_seconds_line(elapsed: f32) {
     let minutes = (elapsed / 60.0) % 60.0;
     let hours = (elapsed / 3600.0) % 24.0;
 
-    let display_seconds = format!("Seconds from Start: {:.2}", seconds);
-    let display_minutes = format!("Minutes from Start: {:.2}", minutes);
-    let display_hours = format!("Hours from Start: {:.2}", hours);
-    // next update i want to get the text lenght nd center it properly
+    let display_text = if state == State::Sync {"Time:"} else {"Time since Start:"};
+    draw_text(&display_text, screen_width() / 70.0, screen_height() / 13.0, screen_width() / 33.0, BLACK);
+    let display_time = format!("{:.0} : {:.0} : {:.0}" , hours, minutes, seconds );
+    
     draw_text(
-        &display_seconds,
+        &display_time,
         screen_width() / 70.0,
         screen_height() / 10.0,
-        screen_width() / 33.0,
-        BLACK,
-    );
-    draw_text(
-        &display_minutes,
-        screen_width() / 70.0,
-        screen_height() / 8.0,
-        screen_width() / 33.0,
-        BLACK,
-    );
-    draw_text(
-        &display_hours,
-        screen_width() / 90.0,
-        screen_height() / 6.0,
         screen_width() / 33.0,
         BLACK,
     );
@@ -147,7 +133,7 @@ let angle_hour_deg = (hours % 12.0) * 30.0 + (minutes / 60.0) * 30.0;
 
 #[macroquad::main("Clock Timer thing with States and such")]
 async fn main() {
-    let mut state = State::Sync;
+    let mut state = State::Timer;
     let mut elapsed_time: f32 = 0.0; // tracks elapsed time while clock is running
 
     let w = 200.0;
@@ -222,7 +208,7 @@ async fn main() {
                     40.0,
                     BLACK,
                 );
-                draw_seconds_line(elapsed_time);
+                draw_seconds_line(state ,elapsed_time);
 
                 // chill, do nothing
             }
@@ -230,7 +216,7 @@ async fn main() {
 
         draw_clock(state, radius_poly);
         draw_minute_marks();
-        draw_seconds_line(elapsed_time);
+        draw_seconds_line(state ,elapsed_time);
 
         draw_poly(
             screen_width() / 2.0,
