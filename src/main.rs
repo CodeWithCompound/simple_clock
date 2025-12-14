@@ -90,7 +90,7 @@ fn draw_seconds_line(state: State, elapsed: f32) {
 
     let display_text = if state == State::Sync {"Time:"} else {"Time since Start:"};
     draw_text(&display_text, screen_width() / 70.0, screen_height() / 13.0, screen_width() / 33.0, BLACK);
-    let display_time = format!("{:.0} : {:.0} : {:.0}" , hours, minutes, seconds );
+    let display_time = format!("{:.0} : {:.0} : {:.0}" , hours.floor(), minutes.floor(), seconds.floor() );
     
     draw_text(
         &display_time,
@@ -118,7 +118,7 @@ fn draw_seconds_line(state: State, elapsed: f32) {
     let end_min_y = cy - line_length_min * cos_min;
     draw_line(cx, cy, end_min_x, end_min_y, 4.0, BLUE);
 
-let angle_hour_deg = (hours % 12.0) * 30.0 + (minutes / 60.0) * 30.0;
+    let angle_hour_deg = (hours % 12.0) * 30.0 + (minutes / 60.0);
     let angle_hour_rad = angle_hour_deg.to_radians();
     let (sin_hour, cos_hour) = angle_hour_rad.sin_cos();
     let line_length_hour = 100.0;
@@ -126,14 +126,14 @@ let angle_hour_deg = (hours % 12.0) * 30.0 + (minutes / 60.0) * 30.0;
     let end_hour_y = cy - line_length_hour * cos_hour;
 
     draw_line(cx, cy, end_hour_x, end_hour_y, 6.0, DARKGRAY);
-        draw_line(cx, cy, end_min_x, end_min_y, 4.0, BLACK);
+    draw_line(cx, cy, end_min_x, end_min_y, 4.0, BLACK);
     draw_line(cx, cy, end_sec_x, end_sec_y, 2.0, RED);
 
 }
 
 #[macroquad::main("Clock Timer thing with States and such")]
 async fn main() {
-    let mut state = State::Timer;
+    let mut state = State::Sync;
     let mut elapsed_time: f32 = 0.0; // tracks elapsed time while clock is running
 
     let w = 200.0;
