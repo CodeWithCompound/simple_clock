@@ -208,7 +208,11 @@ async fn main() {
             }
             State::Sync => {
                 let now = Local::now();
-                elapsed_time = (now.minute() * 60 + now.second()) as f32;
+                elapsed_time =
+    ((now.hour() * 3600) +
+     now.minute() * 60 +
+     now.second()) as f32;
+
                 let sec: u32 = now.second();
                 let min: u32 = now.minute();
                 draw_text(
