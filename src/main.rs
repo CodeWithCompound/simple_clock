@@ -131,6 +131,7 @@ async fn main() {
     let mut state = State::Timer;
     // tracks elapsed time while clock is running
     let mut elapsed_time: f32 = 0.0;
+    let mut saved_time: f32 = 0.0;
 
     let w = 200.0;
     let h = 100.0;
@@ -178,6 +179,9 @@ async fn main() {
             }
             State::Stopped => {
                 let button_text = "Start Clock";
+                if button_make("Reset Time", screen_width() - 180.0, screen_height() - 100.0, 160.0, 40.0) {
+                    elapsed_time = 0.0;
+                }
                 draw_poly(
                     screen_width() / 2.0,
                     screen_height() / 2.0,
@@ -216,6 +220,8 @@ async fn main() {
 
                             if button_make("Go to Timer",20.0,  screen_height() - 100.0, 180.0, 40.0) {
                 state = State::Stopped;
+                saved_time = elapsed_time;
+                
                 elapsed_time = 0.0; // reset elapsed time when syncing
             }
             }
