@@ -80,15 +80,11 @@ fn draw_seconds_line(state: State, elapsed: f32) {
     let dim_time = measure_text(&display_time, None, 20, 1.0);
     let pos_box = vec2(20.0, 20.0);
     let dim_box = vec2(dim_time.width + 20.0, dim_time.height + 20.0);
+    
     draw_rectangle(pos_box.x, pos_box.y, dim_box.x, dim_box.y, WHITE);
-    draw_text(&display_time, pos_box.x - dim_box.x / 2.0, pos_box.y + dim_box.y / 2.0, 20.0, BLACK);
+    draw_rectangle_lines(pos_box.x, pos_box.y, dim_box.x, dim_box.y, 7.0,BLACK);
 
-
-    let display_text = if state == State::Sync {
-        "Time:"
-    } else {
-        "Time since Start:"
-    };
+    draw_text(&display_time, pos_box.x + dim_box.x / 2.0 - dim_time.width / 2.0  , pos_box.y  + dim_box.y / 2.0, 20.0, BLACK);
 
     // 360 deg / 60 s = 6 deg per second
     let angle_sec_deg = seconds * 6.0_f32;
@@ -119,10 +115,20 @@ fn draw_seconds_line(state: State, elapsed: f32) {
     draw_line(cx, cy, end_min_x, end_min_y, 4.0, BLACK);
     draw_line(cx, cy, end_sec_x, end_sec_y, 2.0, RED);
 }
+fn button_make(label: &str, x: f32, y: f32, w: f32, h: f32) -> bool {
+    let (mx, my) = mouse_position();
+    let hovered = mx >= x && mx <= x + w && my >= y && my <= y + h;
+    let clicked = is_mouse_button_pressed(MouseButton::Left) && hovered;
 
+    draw_rectangle(x, y, w, h, if hovered { LIGHTGRAY } else { WHITE });
+    draw_text(label, x + 10.0, y + h / 2.0 + 10.0, 30.0, BLACK);
+    draw_rectangle_lines(x, y, w, h, 3.0, BLACK);
+
+    clicked
+}
 #[macroquad::main("Clock Timer thing with States and such")]
 async fn main() {
-    let mut state = State::Sync;
+    let mut state = State::Timer;
     // tracks elapsed time while clock is running
     let mut elapsed_time: f32 = 0.0;
 
@@ -142,6 +148,7 @@ async fn main() {
         let clicked = is_mouse_button_pressed(MouseButton::Left) && hovered;
 
         clear_background(GRAY);
+
 
         match state {
             State::Timer => {
@@ -163,6 +170,11 @@ async fn main() {
                 if clicked {
                     state = State::Stopped;
                 }
+                            if button_make("Sync Time",20.0,  screen_height() - 100.0, 140.0, 40.0) {
+                state = State::Sync;
+                elapsed_time = 0.0; // reset elapsed time when syncing
+            }
+                
             }
             State::Stopped => {
                 let button_text = "Start Clock";
@@ -181,7 +193,12 @@ async fn main() {
                 if clicked {
                     state = State::Timer;
                 }
+            if button_make("Sync Time",20.0,  screen_height() - 100.0, 140.0, 40.0) {
+                state = State::Sync;
+                elapsed_time = 0.0; // reset elapsed time when syncing
             }
+        }
+
             State::Sync => {
                 let now = Local::now();
                 elapsed_time = ((now.hour() * 3600) + now.minute() * 60 + now.second()) as f32;
@@ -197,7 +214,10 @@ async fn main() {
                 );
                 draw_seconds_line(state, elapsed_time);
 
-                // chill, do nothing
+                            if button_make("Go to Timer",20.0,  screen_height() - 100.0, 180.0, 40.0) {
+                state = State::Stopped;
+                elapsed_time = 0.0; // reset elapsed time when syncing
+            }
             }
         }
 
