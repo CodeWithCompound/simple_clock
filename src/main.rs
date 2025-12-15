@@ -68,8 +68,6 @@ fn draw_minute_marks() {
 
 fn draw_seconds_line(state: State, elapsed: f32) {
     // seconds in the current minute and minutes in the current hour and so on
-    let font_size = 40.0;
-    let font_scale = 1.0;
     let seconds = elapsed % 60.0;
     let minutes = (elapsed / 60.0) % 60.0;
     let hours = (elapsed / 3600.0) % 24.0;
@@ -79,49 +77,18 @@ fn draw_seconds_line(state: State, elapsed: f32) {
         minutes.floor(),
         seconds.floor()
     );
+    let dim_time = measure_text(&display_time, None, 20, 1.0);
+    let pos_box = vec2(20.0, 20.0);
+    let dim_box = vec2(dim_time.width + 20.0, dim_time.height + 20.0);
+    draw_rectangle(pos_box.x, pos_box.y, dim_box.x, dim_box.y, WHITE);
+    draw_text(&display_time, pos_box.x - dim_box.x / 2.0, pos_box.y + dim_box.y / 2.0, 20.0, BLACK);
 
-    let metrics = measure_text(&display_time, None, font_size as u16, font_scale);
-    let width_display = metrics.width + 20.0;
-    let height_display = metrics.height + 20.0;
-    let text_x = screen_width() / 95.0 + 10.0;
-    let text_y = screen_height() / 95.0 + 10.0;
-    
-    draw_rectangle(
-        text_x,
-        text_y,
-        width_display,
-        height_display,
-        LIGHTGRAY,
-    );
-    draw_rectangle_lines(
-        screen_width() / 95.0,
-        screen_height() / 95.0,
-        metrics.width + 20.0,
-        metrics.height + 20.0,
-        7.0,
-        BLACK,
-    );
 
     let display_text = if state == State::Sync {
         "Time:"
     } else {
         "Time since Start:"
     };
-    draw_text(
-        &display_text,
-        text_x,
-        text_y,
-        screen_width() / 33.0,
-        BLACK,
-    );
-
-    draw_text(
-        &display_time,
-        40.0,
-        40.0,
-        screen_width() / 33.0,
-        BLACK,
-    );
 
     // 360 deg / 60 s = 6 deg per second
     let angle_sec_deg = seconds * 6.0_f32;
